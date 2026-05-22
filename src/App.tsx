@@ -150,11 +150,15 @@ export default function App() {
       return
     }
 
-    const {error} = await supabase.from("predictions").insert({
+    const {error} = await supabase.from("predictions").upsert({
       user_id: uid,
       match_id: matchId,
       predicted_winner: winnerPick,
-    })
+      },
+      {
+        onConflict: "user_id, match_id",
+      }
+    )
     
     if(error) alert(error.message)
     else alert("prediction saved!")
