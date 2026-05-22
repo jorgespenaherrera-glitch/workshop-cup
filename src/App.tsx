@@ -36,6 +36,8 @@ type Standings = {
 export default function App() {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
+  const [isResettingPassword, setIsResettingPassword] = useState(false)
+  const[newPassword, setNewPassword] = useState("")
   const [username, setUsername] = useState("")
   const [isSignup, setIsSignup] = useState(false)
   const [userEmail, setUserEmail] = useState<string | null>(null)
@@ -48,7 +50,12 @@ export default function App() {
     supabase.auth.getUser().then(({data}) => {
       setUserEmail(data.user?.email ?? null)
     })
-  }, [])
+    supabase.auth.onAuthStateChange((event) => {
+      if (event === "PASSWORD_RECOVERY"){
+        setIsResettingPassword(true)
+      }
+    })
+  }, []) 
 
 
   useEffect(() =>{
@@ -89,6 +96,43 @@ export default function App() {
       const{data} = await supabase.auth.getUser()
       setUserEmail(data.user?.email ?? null)
     }
+  }
+
+  async function resetPassword(){
+    if(!email){
+      alert("Enter your email first")
+      return
+    }
+    const { error } = await supabase.auth.resetPasswordForEmail(
+      email,
+      {
+        redirectTo: "https://workshop-cup.vercel.app"
+      }
+    ) 
+    if (error){
+      alert(error.message)
+    } else{
+      alert("Password reset email sent")
+    }
+  }
+
+  async function updatePassword() {
+    if(!newPassword){
+      alert("Enter a new Password")
+      return
+    }
+    const {error} = await supabase.auth.updateUser({
+      password: newPassword,
+    })
+    if (error){
+      alert(error.message)
+      return
+    }
+    alert("Password Updated. Please log in again")
+    setIsResettingPassword(false)
+    setNewPassword("")
+    await supabase.auth.signOut()
+    setUserEmail(null)
   }
 
   async function signOut() {
@@ -176,6 +220,25 @@ export default function App() {
     m => !m.round?.toLowerCase().includes("group")
   )
 
+  if(isResettingPassword){
+    return(
+      <div style={{ padding: 20}}>
+        <h2>Reset Password</h2>
+        <input 
+          placeholder="new Password"
+          type = "password"
+          value = {newPassword}
+          onChange={(e) => setNewPassword(e.target.value)}
+        />
+        <br />
+
+        <button onClick={updatePassword}>
+          Update Password
+        </button>
+      </div>
+    )
+  }
+  
   if(!userEmail){
     return(
       <div style = {{
@@ -231,6 +294,19 @@ export default function App() {
         <button onClick={isSignup ? signUp : signIn}>
           {isSignup ? "Create Account" : "Log In"}
         </button>
+          <div style={{marginTop: 10}}> 
+            <button
+              onClick = {resetPassword}
+              style = {{
+                background: "none",
+                border: "none",
+                color: "blue",
+                cursor: "pointer"
+              }}
+            >
+              Forgot Password?
+            </button>
+          </div>
       </div>
     </div>
     )
@@ -297,7 +373,7 @@ export default function App() {
           Start: {new Date(m.start_time).toLocaleString()}
         </div>
 
-        {locked && <div>Predictions Locked</div>}
+        {locked && <div>Predictions Locked 🔒</div>}
 
         <button disabled = {locked} onClick={() => predict(m.id, m.home_team)}>
          {m.home_team}
