@@ -33,6 +33,34 @@ type Standings = {
 }
 
 
+const flags: Record<string, string> = {
+  "Mexico": "🇲🇽",
+  "South Africa": "🇿🇦",
+  "South Korea": "🇰🇷",
+  "Czech Republic": "🇨🇿",
+  "Canada": "🇨🇦",
+  "Bosnia & Herzegovina": "🇧🇦",
+  "USA": "🇺🇸",
+  "Paraguay": "🇵🇾",
+  "Qatar": "🇶🇦",
+  "Switzerland": "🇨🇭",
+  "Brazil": "🇧🇷",
+  "Morocco": "🇲🇦",
+  "Haiti": "🇭🇹",
+  "Scotland": "🏴󠁧󠁢󠁳󠁣󠁴󠁿",
+  "Australia": "🇦🇺",
+  "Türkiye": "🇹🇷",
+  "Germany": "🇩🇪",
+  "Curaçao": "🇨🇼",
+  "Ecuador": "🇪🇨"
+}
+
+function getFlag(team: string) {
+  return flags[team] || "🏳️"
+}
+
+
+
 export default function App() {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
@@ -353,12 +381,18 @@ export default function App() {
         What will your predictions for the World Cup be...
       </p>
     </div>
-      <div style = {{marginBottom:20}}>
+      <div 
+        style = {{
+        marginBottom:20,
+        display: "flex",
+        justifyContent: "center",
+        gap: 10
+        }}
+        >
           <button onClick={() => setPage("matches")}>Matches</button>
 
           <button
             onClick={() => setPage("leaderboard")}
-            style = {{marginLeft: 8}}
           >
             Leaderboard
           </button>
@@ -380,17 +414,30 @@ export default function App() {
         marginBottom: 16, 
         padding: 16,
         border: "1px solid #ddd",
-        borderRadius: 12,
-        boxShadow: "0 2px 8px rgba(0,0,0,0.08)"
+        borderRadius: 14,
+        boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
+        background: "rgba(255, 255, 255, 0.03)"
       }}
       >
 
-        <div>
-          <b>{m.home_team}</b> vs <b>{m.away_team}</b>
+        <div
+          style={{
+            fontSize: 22,
+            fontWeight: "bold",
+            marginBottom: 10
+          }}
+        >
+          {getFlag(m.home_team)} {m.home_team} {" "} ⚽ {" "}{getFlag(m.away_team)} {m.away_team}
         </div>
 
-        <div>
-          Start: {new Date(m.start_time).toLocaleString()}
+        <div
+          style={{
+            color: "#bdbdbd",
+            fontSize: 14,
+            marginBottom: 12
+          }}
+        >
+          Start🕒: {new Date(m.start_time).toLocaleString()}
         </div>
 
         {locked && <div>Predictions Locked 🔒</div>}
@@ -441,7 +488,8 @@ export default function App() {
     padding: 16,
     border: "1px solid #ddd",
     borderRadius: 12,
-    boxShadow: "0 2px 8px rgba(0,0,0,0.08)"
+    boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
+    background: "rgba(255, 255, 255, 0.03)"
   }}
   >
 
@@ -449,8 +497,14 @@ export default function App() {
       <b>{m.home_team}</b> vs <b>{m.away_team}</b>
     </div>
 
-    <div>
-      Start: {new Date(m.start_time).toLocaleString()}
+    <div
+      style={{
+        color: " #bdbdbd ",
+        fontSize: 14,
+        marginBottom: 12
+      }}
+    >
+      Start🕒: {new Date(m.start_time).toLocaleString()}
     </div>
 
     <button onClick={() => predict(m.id, m.home_team)}>
