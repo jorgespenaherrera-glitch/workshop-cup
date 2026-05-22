@@ -283,37 +283,45 @@ export default function App() {
   <p>No Group Stage Matches</p>
 )}
 
-{groupMatches.map((m) => (
-  <div key={m.id} style={{ marginBottom: 12 }}>
+{groupMatches.map((m) => {
+    const locked = 
+      new Date(m.start_time).getTime() - Date.now() <= 10 * 60 * 1000
+    return(
+      <div key={m.id} style={{ marginBottom: 12 }}>
 
-    <div>
-      <b>{m.home_team}</b> vs <b>{m.away_team}</b>
-    </div>
+        <div>
+          <b>{m.home_team}</b> vs <b>{m.away_team}</b>
+        </div>
 
-    <div>
-      Start: {new Date(m.start_time).toLocaleString()}
-    </div>
+        <div>
+          Start: {new Date(m.start_time).toLocaleString()}
+        </div>
 
-    <button onClick={() => predict(m.id, m.home_team)}>
-      {m.home_team}
-    </button>
+        {locked && <div>Predictions Locked</div>}
 
-    <button
-      onClick={() => predict(m.id, m.away_team)}
-      style={{ marginLeft: 8 }}
-    >
-      {m.away_team}
-    </button>
+        <button disabled = {locked} onClick={() => predict(m.id, m.home_team)}>
+         {m.home_team}
+        </button>
 
-    <button
-      onClick={() => predict(m.id, "Draw")}
-      style={{ marginLeft: 8 }}
-    >
-      Draw
-    </button>
+       <button
+          disabled={locked}
+          onClick={() => predict(m.id, m.away_team)}
+          style={{ marginLeft: 8 }}
+        >
+          {m.away_team}
+        </button>
 
-  </div>
-))}
+        <button
+          disabled = {locked}
+          onClick={() => predict(m.id, "Draw")}
+          style={{ marginLeft: 8 }}
+        >
+          Draw
+        </button>
+
+      </div>
+        )
+    })}
 
 <h3 style={{ marginTop: 30 }}>
 🔥 Knockout Stage
