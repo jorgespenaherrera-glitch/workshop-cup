@@ -233,9 +233,33 @@ export default function App() {
   }
 
   return(
-    <div style = {{padding: 20}}>
-      <h2> Welcome: {userEmail}</h2>
-      <button onClick={signOut}>Sign out</button>
+    <div style={{ padding: 20 }}>
+
+    <div
+      style={{
+        display: "flex",
+        justifyContent: "flex-end"
+      }}
+    >
+      <button onClick={signOut}>
+        Sign out
+      </button>
+    </div>
+
+    <div
+      style={{
+        textAlign: "center",
+        marginBottom: 30
+      }}
+    >
+      <h1 style={{ marginBottom: 10 }}>
+        🏆 World Cup 2026 🏆
+      </h1>
+
+      <p>
+        What will your predictions for the World Cup be...
+      </p>
+    </div>
       <div style = {{marginBottom:20}}>
           <button onClick={() => setPage("matches")}>Matches</button>
 
@@ -367,11 +391,9 @@ export default function App() {
             <div key={s.user_id} style={{ marginBottom: 8}}>
               <b>{index + 1}.</b> {s.username} - <b>{s.points}</b> points
             </div>
-      ))}
-      </>
-      )}
+          ))}
 
-      <h3 style = {{marginTop: 30 }} >My Predictions</h3>
+          <h3 style = {{marginTop: 30 }} >My Predictions</h3>
 
       {predictions.length === 0 && <p>No Predictions yet.</p>}
 
@@ -401,6 +423,8 @@ export default function App() {
       })
 
       }
+        </>
+      )}
 
     </div>
   )
