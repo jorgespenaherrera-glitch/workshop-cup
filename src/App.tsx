@@ -220,6 +220,13 @@ export default function App() {
     m => !m.round?.toLowerCase().includes("group")
   )
 
+  function getMyPick(matchId:string){
+    const prediction = predictions.find(
+      (p) => p.match_id === matchId
+    )
+    return prediction?.predicted_winner ?? null
+  }
+
   if(isResettingPassword){
     return(
       <div style={{ padding: 20}}>
@@ -313,7 +320,13 @@ export default function App() {
   }
 
   return(
-    <div style={{ padding: 20 }}>
+    <div 
+      style={{ 
+        padding: 20,
+        maxWidth: 900,
+        margin: "0 auto", 
+      }}
+    >
 
     <div
       style={{
@@ -363,7 +376,14 @@ export default function App() {
     const locked = 
       new Date(m.start_time).getTime() - Date.now() <= 10 * 60 * 1000
     return(
-      <div key={m.id} style={{ marginBottom: 12 }}>
+      <div key={m.id} style={{ 
+        marginBottom: 16, 
+        padding: 16,
+        border: "1px solid #ddd",
+        borderRadius: 12,
+        boxShadow: "0 2px 8px rgba(0,0,0,0.08)"
+      }}
+      >
 
         <div>
           <b>{m.home_team}</b> vs <b>{m.away_team}</b>
@@ -375,14 +395,19 @@ export default function App() {
 
         {locked && <div>Predictions Locked 🔒</div>}
 
-        <button disabled = {locked} onClick={() => predict(m.id, m.home_team)}>
+        <button disabled = {locked} onClick={() => predict(m.id, m.home_team)} style={{
+          background: getMyPick(m.id) === m.home_team ? "#90EE90" : "",
+        }}>
          {m.home_team}
         </button>
 
        <button
           disabled={locked}
           onClick={() => predict(m.id, m.away_team)}
-          style={{ marginLeft: 8 }}
+          style={{ 
+            marginLeft: 8, 
+            background: getMyPick(m.id) === m.away_team ? "#90EE90" : "",
+          }}
         >
           {m.away_team}
         </button>
@@ -390,7 +415,10 @@ export default function App() {
         <button
           disabled = {locked}
           onClick={() => predict(m.id, "Draw")}
-          style={{ marginLeft: 8 }}
+          style={{ 
+            marginLeft: 8, 
+            background: getMyPick(m.id) === "Draw" ? "#90EE90" : "",
+          }}
         >
           Draw
         </button>
@@ -408,7 +436,14 @@ export default function App() {
 )}
 
 {knockoutMatches.map((m) => (
-  <div key={m.id} style={{ marginBottom: 12 }}>
+  <div key={m.id} style={{ 
+    marginBottom: 12,  
+    padding: 16,
+    border: "1px solid #ddd",
+    borderRadius: 12,
+    boxShadow: "0 2px 8px rgba(0,0,0,0.08)"
+  }}
+  >
 
     <div>
       <b>{m.home_team}</b> vs <b>{m.away_team}</b>
