@@ -52,7 +52,44 @@ const flags: Record<string, string> = {
   "Türkiye": "🇹🇷",
   "Germany": "🇩🇪",
   "Curaçao": "🇨🇼",
-  "Ecuador": "🇪🇨"
+  "Ecuador": "🇪🇨",
+  "Ivory Coast": "🇨🇮",
+
+  "Netherlands": "🇳🇱",
+  "Japan": "🇯🇵",
+  "Sweden": "🇸🇪",
+  "Tunisia": "🇹🇳",
+
+  "Belgium": "🇧🇪",
+  "Egypt": "🇪🇬",
+  "Iran": "🇮🇷",
+  "New Zealand": "🇳🇿",
+
+  "Spain": "🇪🇸",
+  "Cape Verde": "🇨🇻",
+  "Saudi Arabia": "🇸🇦",
+  "Uruguay": "🇺🇾",
+
+  "France": "🇫🇷",
+  "Senegal": "🇸🇳",
+  "Iraq": "🇮🇶", 
+  "Norway": "🇳🇴",
+
+  "Argentina": "🇦🇷",
+  "Algeria": "🇩🇿",
+  "Austria": "🇦🇹",
+  "Jordan": "🇯🇴",
+
+  "Portugal": "🇵🇹",
+  "Congo DR": "🇨🇩",
+  "DR Congo": "🇨🇩",
+  "Uzbekistan": "🇺🇿",
+  "Colombia": "🇨🇴",
+
+  "England": "🏴",
+  "Croatia": "🇭🇷",
+  "Ghana": "🇬🇭",
+  "Panama": "🇵🇦"
 }
 
 function getFlag(team: string) {
@@ -437,7 +474,14 @@ export default function App() {
             marginBottom: 12
           }}
         >
-          Start🕒: {new Date(m.start_time).toLocaleString()}
+          Start🕒: {new Date(m.start_time).toLocaleString("en-US", {
+            timeZone: "America/New_York",
+            month: "short",
+            day: "numeric",
+            year: "numeric",
+            hour: "numeric",
+            minute: "2-digit",
+            })}
         </div>
 
         {locked && <div>Predictions Locked 🔒</div>}
