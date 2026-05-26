@@ -607,45 +607,101 @@ export default function App() {
           <h3 style={{marginTop: 30 }}>Leaderboard</h3>
 
           {standings.length === 0 && <p>No standings yet.</p>}
-
+          
+          <table 
+            style={{
+              width: "100%",
+              borderCollapse: "collapse",
+              marginBottom: 12,
+              borderRadius: 12,
+              overflow: "hidden"
+            }}
+          >
+            <thead>
+              <tr>
+                <th style={{ textAlign: "left", padding: 10, background: "rgba(255, 255, 255, 0.5)"}}>Rank</th>
+                <th style={{ textAlign: "left", padding: 10, background: "rgba(255, 255, 255, 0.5)" }}>Player</th>
+                <th style={{ textAlign: "right", padding: 10, background: "rgba(255, 255, 255, 0.5)" }}>Points</th>
+              </tr>
+            </thead>
+          <tbody>
           {standings.map((s, index) =>  (
-            <div key={s.user_id} style={{ marginBottom: 8}}>
-              <b>{index + 1}.</b> {s.username} - <b>{s.points}</b> points
-            </div>
+            <tr key = {s.user_id}>
+              <td style={{padding: 10}}>
+                {index === 0
+                  ? "🥇"
+                  : index === 1
+                  ? "🥈"
+                  : index === 2
+                  ? "🥉"
+                  : `#${index + 1}`
+                }
+              </td>
+              <td style={{padding: 10}}>{s.username}</td>
+              <td style={{padding: 10, textAlign: "right"}}>
+                <b>{s.points}</b>
+              </td>
+            </tr>
           ))}
+          </tbody>
+        </table>
 
           <h3 style = {{marginTop: 30 }} >My Predictions</h3>
 
       {predictions.length === 0 && <p>No Predictions yet.</p>}
 
-      {predictions.map((p) => {
-        const m = p.matches
-        const outcome = 
-          m?.winner_team == null
-          ? "Pending"
-          : p.predicted_winner === m.winner_team
-          ? "Correct! (+1)"
-          :"Wrong :("
+      {predictions.length > 0 && (
+      <table
+        style={{
+        width: "100%",
+        borderCollapse: "collapse",
+        marginTop: 12,
+      }}
+      >
+        <thead>
+          <tr>
+            <th style={{ textAlign: "left", padding: 10 }}>
+              Match
+            </th>
 
-        return(
-          <div key={p.id} style={{ marginBottom: 10}}>
-            <div>
-              {m ? (
-                <>
-                  <b>{m.home_team}</b> vs <b>{m.away_team}</b> - Pick: <b>{p.predicted_winner}</b>
-                </>
-              ) : (
-                <>Match not Found - Pick: <b>{p.predicted_winner}</b></>
-              )}
-            </div>
-            <div>{outcome}</div>
-          </div>
-        )
-      })
+            <th style={{ textAlign: "left", padding: 10 }}>
+              Your Pick
+            </th>
 
-      }
-        </>
-      )}
+            <th style={{textAlign: "left", padding: 10}}>
+              Status
+            </th>
+          </tr>
+        </thead>
+
+    <tbody>
+      {predictions.map((p) => (
+        <tr key={p.id}>
+          <td style={{ padding: 10 }}>
+            {p.matches?.home_team} ⚽ {p.matches?.away_team}
+          </td>
+
+          <td style={{ padding: 10 }}>
+            <b>{p.predicted_winner}</b>
+          </td>
+
+          <td style={{padding: 10 }}>
+            {
+              !p.matches?.winner_team
+                ? "⏳ Pending"
+                : p.predicted_winner === p.matches.winner_team
+                ?"✅ Correct +1"
+                :"❌ Wrong"
+            }
+          </td>
+
+        </tr>
+      ))}
+    </tbody>
+  </table>
+  )}
+  </>
+  )}
 
     </div>
   )
