@@ -109,6 +109,8 @@ export default function App() {
   const [matches, setMatches] = useState<Match[]>([])
   const [predictions, setPredictions] = useState<Prediction[]>([])
   const [standings, setStandings] = useState<Standings[]>([])
+  const [knockoutStandings, setKnockoutStandings] = useState<Standings[]>([])
+  const [leaderboardView, setLeaderboardView] = useState<"group" | "Knockout">("group")
   const [page, setPage] = useState<"matches" | "leaderboard">("matches")
 
   useEffect(() =>{
@@ -128,6 +130,7 @@ export default function App() {
     loadMatches()
     laodMyPredictions()
     loadStandings()
+    loadKnockoutStandings()
   }, [userEmail])
 
   async function signUp() {
@@ -239,7 +242,7 @@ export default function App() {
 
   async function loadStandings(){
     const { data, error } = await supabase
-      .from("standings")
+      .from("group_stage_standings")
       .select("*")
       .order("points", {ascending: false})
 
@@ -249,6 +252,19 @@ export default function App() {
       }
 
       setStandings(data || [])
+  }
+
+  async function loadKnockoutStandings() {
+    const { data, error } = await supabase
+      .from("knockout_standings")
+      .select("*")
+      .order("points" , {ascending: false})
+
+      if (error){
+        console.error(error)
+      } else {
+        setKnockoutStandings(data || [])
+      }
   }
 
   async function predict(matchId:string, winnerPick: string) {
@@ -526,51 +542,80 @@ export default function App() {
   <p>No Knockout Matches</p>
 )}
 
-{knockoutMatches.map((m) => (
-  <div key={m.id} style={{ 
-    marginBottom: 12,  
-    padding: 16,
-    border: "1px solid #ddd",
-    borderRadius: 12,
-    boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
-    background: "rgba(255, 255, 255, 0.03)"
-  }}
-  >
-
-    <div>
-      <b>{m.home_team}</b> vs <b>{m.away_team}</b>
-    </div>
-
-    <div
-      style={{
-        color: " #bdbdbd ",
-        fontSize: 14,
-        marginBottom: 12
+{knockoutMatches.map((m) => {
+    const locked = 
+      new Date(m.start_time).getTime() - Date.now() <= 10 * 60 * 1000
+    return(
+      <div key={m.id} style={{ 
+        marginBottom: 16, 
+        padding: 16,
+        border: "1px solid #ddd",
+        borderRadius: 14,
+        boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
+        background: "rgba(255, 255, 255, 0.03)"
       }}
-    >
-      Start🕒: {new Date(m.start_time).toLocaleString()}
-    </div>
+      >
 
-    <button onClick={() => predict(m.id, m.home_team)}>
-      {m.home_team}
-    </button>
+        <div
+          style={{
+            fontSize: 22,
+            fontWeight: "bold",
+            marginBottom: 10
+          }}
+        >
+          {getFlag(m.home_team)} {m.home_team} {" "} ⚽ {" "}{getFlag(m.away_team)} {m.away_team}
+        </div>
 
-    <button
-      onClick={() => predict(m.id, m.away_team)}
-      style={{ marginLeft: 8 }}
-    >
-      {m.away_team}
-    </button>
+        <div
+          style={{
+            color: "#bdbdbd",
+            fontSize: 14,
+            marginBottom: 12
+          }}
+        >
+          Start🕒: {new Date(m.start_time).toLocaleString("en-US", {
+            timeZone: "America/New_York",
+            month: "short",
+            day: "numeric",
+            year: "numeric",
+            hour: "numeric",
+            minute: "2-digit",
+            })}
+        </div>
 
-    <button
-      onClick={() => predict(m.id, "Draw")}
-      style={{ marginLeft: 8 }}
-    >
-      Draw
-    </button>
+        {locked && <div>Predictions Locked 🔒</div>}
 
-  </div>
-))}
+        <button disabled = {locked} onClick={() => predict(m.id, m.home_team)} style={{
+          background: getMyPick(m.id) === m.home_team ? "#90EE90" : "",
+        }}>
+         {m.home_team}
+        </button>
+
+       <button
+          disabled={locked}
+          onClick={() => predict(m.id, m.away_team)}
+          style={{ 
+            marginLeft: 8, 
+            background: getMyPick(m.id) === m.away_team ? "#90EE90" : "",
+          }}
+        >
+          {m.away_team}
+        </button>
+
+        <button
+          disabled = {locked}
+          onClick={() => predict(m.id, "Draw")}
+          style={{ 
+            marginLeft: 8, 
+            background: getMyPick(m.id) === "Draw" ? "#90EE90" : "",
+          }}
+        >
+          Draw
+        </button>
+
+      </div>
+        )
+    })}
 
       <h3 style = {{marginTop: 30}}>Finished Matches</h3>
 
@@ -607,6 +652,17 @@ export default function App() {
           <h3 style={{marginTop: 30 }}>Leaderboard</h3>
 
           {standings.length === 0 && <p>No standings yet.</p>}
+
+          <div style = {{ marginBottom: 16 }}>
+            <button onClick={() => setLeaderboardView("group")}>
+              Group Stage
+            </button>
+
+            <button onClick={() => setLeaderboardView("Knockout")} style={{marginLeft: 8}}>
+              Knockout Stage
+            </button>
+
+          </div>
           
           <table 
             style={{
@@ -625,7 +681,7 @@ export default function App() {
               </tr>
             </thead>
           <tbody>
-          {standings.map((s, index) =>  (
+          {(leaderboardView == "group" ? standings: knockoutStandings).map((s, index) =>  (
             <tr key = {s.user_id}>
               <td style={{padding: 10}}>
                 {index === 0

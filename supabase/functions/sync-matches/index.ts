@@ -104,8 +104,8 @@ Deno.serve(async () => {
                 const awayTeam = item.teams.away.name
                 const startTime = item.fixture.date
                 const status = mapStatus(item.fixture.status.short)
-                const homeScore = item.goals.home
-                const awayScore = item.goals.away
+                const homeScore = item.score?.fulltime?.home ?? item.goals.home
+                const awayScore = item.score?.fulltime?.away ?? item.goals.away
 
                 const winner = 
                     status === "Finished"
